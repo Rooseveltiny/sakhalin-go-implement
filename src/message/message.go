@@ -2,8 +2,8 @@ package message
 
 import (
 	"encoding/binary"
-	"maryprotocol/color"
 	"math"
+	"sakhalin/color"
 )
 
 type Message struct {

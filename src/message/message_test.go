@@ -1,7 +1,7 @@
 package message
 
 import (
-	"maryprotocol/color"
+	"sakhalin/color"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"

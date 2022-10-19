@@ -1,4 +1,4 @@
-module maryprotocol
+module sakhalin
 
 go 1.18
 
