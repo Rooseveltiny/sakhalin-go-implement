@@ -214,3 +214,90 @@ func (ctx *Context) Rect(x, y, width, height float64) {
 func (ctx *Context) Restore() {
 	ctx.AppendSingleByte(flags.B_Restore)
 }
+
+func (ctx *Context) Rotate(angle float64) {
+	ctx.AppendSingleByte(flags.B_Rotate)
+	ctx.AppendFloat64(angle)
+}
+
+func (ctx *Context) Save() {
+	ctx.AppendSingleByte(flags.B_Save)
+}
+
+func (ctx *Context) Scale(x, y float64) {
+	ctx.AppendSingleByte(flags.B_Scale)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) Stroke() {
+	ctx.AppendSingleByte(flags.B_Stroke)
+}
+
+func (ctx *Context) StrokeText(text string, x, y float64) {
+	ctx.AppendSingleByte(flags.B_StrokeText)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendString(text)
+}
+
+func (ctx *Context) StrokeTextMaxWidth(text string, x, y, maxWidth float64) {
+	ctx.AppendSingleByte(flags.B_StrokeTextMaxWidth)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(maxWidth)
+	ctx.AppendString(text)
+}
+
+func (ctx *Context) StrokeRect(x, y, width, height float64) {
+	ctx.AppendSingleByte(flags.B_StrokeRect)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(width)
+	ctx.AppendFloat64(height)
+}
+
+func (ctx *Context) Translate(x, y float64) {
+	ctx.AppendSingleByte(flags.B_Translate)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) Transform(a, b, c, d, e, f float64) {
+	ctx.AppendSingleByte(flags.B_Transform)
+	ctx.AppendFloat64(a)
+	ctx.AppendFloat64(b)
+	ctx.AppendFloat64(c)
+	ctx.AppendFloat64(d)
+	ctx.AppendFloat64(e)
+	ctx.AppendFloat64(f)
+}
+
+func (ctx *Context) PutTransform(a, b, c, d, e, f float64) {
+	ctx.AppendSingleByte(flags.B_PutTransform)
+	ctx.AppendFloat64(a)
+	ctx.AppendFloat64(b)
+	ctx.AppendFloat64(c)
+	ctx.AppendFloat64(d)
+	ctx.AppendFloat64(e)
+	ctx.AppendFloat64(f)
+}
+
+func (ctx *Context) PutLineDash(segments []float64) {
+	ctx.AppendSingleByte(flags.B_PutLineDash)
+	ctx.AppendUint32(uint32(len(segments)))
+	for _, s := range segments {
+		ctx.AppendFloat64(s)
+	}
+}
+
+// func (ctx *Context) CreateImageData()
+// func (ctx *Context) PutImageData()
+// func (ctx *Context) PutImageDataDirty()
+// func (ctx *Context) DrawImage()
+// func (ctx *Context) DrawImageScaled()
+// func (ctx *Context) DrawImageSubRectangle()
+// func (ctx *Context) CreateLinearGradient()
+// func (ctx *Context) CreateRadialGradient()
+// func (ctx *Context) CreatePattern()
+// func (ctx *Context) GetImageData()

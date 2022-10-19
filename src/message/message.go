@@ -7,29 +7,29 @@ import (
 )
 
 type Message struct {
-	message []byte
-	err     error
+	Message []byte
+	Err     error
 }
 
 func NewMessage(b []byte) *Message {
 	return &Message{
-		message: b,
-		err:     nil,
+		Message: b,
+		Err:     nil,
 	}
 }
 
 func (m *Message) AppendSingleByte(b byte) {
-	m.message = append(m.message, b)
+	m.Message = append(m.Message, b)
 }
 
 func (m *Message) AppendFloat64(f float64) {
-	m.message = append(m.message, 0, 0, 0, 0, 0, 0, 0, 0)
-	binary.BigEndian.PutUint64(m.message[len(m.message)-8:], math.Float64bits(f))
+	m.Message = append(m.Message, 0, 0, 0, 0, 0, 0, 0, 0)
+	binary.BigEndian.PutUint64(m.Message[len(m.Message)-8:], math.Float64bits(f))
 }
 
 func (m *Message) AppendUint32(ui uint32) {
-	m.message = append(m.message, 0, 0, 0, 0)
-	binary.BigEndian.PutUint32(m.message[len(m.message)-4:], ui)
+	m.Message = append(m.Message, 0, 0, 0, 0)
+	binary.BigEndian.PutUint32(m.Message[len(m.Message)-4:], ui)
 }
 
 func (m *Message) AppendBoolean(b bool) {
@@ -41,12 +41,12 @@ func (m *Message) AppendBoolean(b bool) {
 }
 
 func (m *Message) AppendBytes(bytes []byte) {
-	m.message = append(m.message, bytes...)
+	m.Message = append(m.Message, bytes...)
 }
 
 func (m *Message) AppendString(s string) {
 	m.AppendUint32(uint32(len(s)))
-	m.message = append(m.message, []byte(s)...)
+	m.Message = append(m.Message, []byte(s)...)
 }
 
 func (m *Message) AppendColor(c color.IColor) {
@@ -65,32 +65,32 @@ const (
 )
 
 func (m *Message) RetrieveSingleByte() byte {
-	if len(m.message) < singleByte {
+	if len(m.Message) < singleByte {
 		m.short()
 		return 0
 	}
-	b := m.message[0]
-	m.message = m.message[singleByte:]
+	b := m.Message[0]
+	m.Message = m.Message[singleByte:]
 	return b
 }
 
 func (m *Message) RetrieveUint32() uint32 {
-	if len(m.message) < fourBytes {
+	if len(m.Message) < fourBytes {
 		m.short()
 		return 0
 	}
-	i := binary.BigEndian.Uint32(m.message)
-	m.message = m.message[fourBytes:]
+	i := binary.BigEndian.Uint32(m.Message)
+	m.Message = m.Message[fourBytes:]
 	return i
 }
 
 func (m *Message) RetrieveUint64() uint64 {
-	if len(m.message) < eightBytes {
+	if len(m.Message) < eightBytes {
 		m.short()
 		return 0
 	}
-	i := binary.BigEndian.Uint64(m.message)
-	m.message = m.message[eightBytes:]
+	i := binary.BigEndian.Uint64(m.Message)
+	m.Message = m.Message[eightBytes:]
 	return i
 }
 
@@ -104,26 +104,26 @@ func (m *Message) RetrieveBool() bool {
 
 func (m *Message) RetrieveString() string {
 	length := int(m.RetrieveUint32())
-	if len(m.message) < length {
+	if len(m.Message) < length {
 		m.short()
 		return emptyString
 	}
-	s := string(m.message[:length])
-	m.message = m.message[length:]
+	s := string(m.Message[:length])
+	m.Message = m.Message[length:]
 	return s
 }
 
 func (m *Message) Clear() {
-	m.message = make([]byte, 0, cap(m.message))
+	m.Message = make([]byte, 0, cap(m.Message))
 }
 
 func (m *Message) short() {
 	m.Clear()
-	m.err = errDataTooShort{}
+	m.Err = errDataTooShort{}
 }
 
 type errDataTooShort struct{}
 
 func (err errDataTooShort) Error() string {
-	return "message bytes array too short to retrieve data"
+	return "Message bytes array too short to retrieve data"
 }

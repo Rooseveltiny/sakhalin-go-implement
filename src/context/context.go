@@ -8,3 +8,7 @@ type Context struct {
 	// events <- chan
 	messagePool message.Message
 }
+
+func (ctx *Context) Go() {
+	ctx.draws <- ctx.messagePool.Message
+}

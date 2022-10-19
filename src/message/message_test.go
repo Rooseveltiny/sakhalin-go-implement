@@ -14,36 +14,36 @@ func fetchByteArray() []byte {
 func TestMessageInit(t *testing.T) {
 	Convey("test message init", t, func() {
 		newMessage := NewMessage([]byte{})
-		So(len(newMessage.message), ShouldEqual, 0)
+		So(len(newMessage.Message), ShouldEqual, 0)
 		Convey("test add one single byte", func() {
 			newMessage.AppendSingleByte(0x1)
-			So(newMessage.message[0], ShouldEqual, 0x1)
-			So(len(newMessage.message), ShouldEqual, 1)
+			So(newMessage.Message[0], ShouldEqual, 0x1)
+			So(len(newMessage.Message), ShouldEqual, 1)
 			Convey("test add float64", func() {
 				newMessage.AppendFloat64(0.64)
-				So(len(newMessage.message), ShouldEqual, 9)
-				So(newMessage.message[3], ShouldEqual, 0x7a)
+				So(len(newMessage.Message), ShouldEqual, 9)
+				So(newMessage.Message[3], ShouldEqual, 0x7a)
 				Convey("test add uint32", func() {
 					newMessage.AppendUint32(21000)
-					So(len(newMessage.message), ShouldEqual, 13)
-					So(cap(newMessage.message), ShouldEqual, 16)
-					So(newMessage.message[10], ShouldEqual, 0x0)
+					So(len(newMessage.Message), ShouldEqual, 13)
+					So(cap(newMessage.Message), ShouldEqual, 16)
+					So(newMessage.Message[10], ShouldEqual, 0x0)
 					// two bytes left free because uint32 isn't so much big
 					Convey("test add bool", func() {
 						newMessage.AppendBoolean(true)
-						So(newMessage.message[13], ShouldEqual, 0b1)
+						So(newMessage.Message[13], ShouldEqual, 0b1)
 						Convey("test add bytes", func() {
 							newMessage.AppendBytes([]byte{100, 200, 255})
-							So(newMessage.message[14], ShouldEqual, 0b01100100)
-							So(newMessage.message[15], ShouldEqual, 0b11001000)
-							So(newMessage.message[16], ShouldEqual, 0b11111111)
+							So(newMessage.Message[14], ShouldEqual, 0b01100100)
+							So(newMessage.Message[15], ShouldEqual, 0b11001000)
+							So(newMessage.Message[16], ShouldEqual, 0b11111111)
 							Convey("test add string", func() {
 								newMessage.AppendString("Hello world!")
 								bytes := []byte{
 									0x0, 0x0, 0x0, 0xc, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21,
 								}
-								So(newMessage.message[17:], ShouldResemble, bytes)
-								So(newMessage.message, ShouldResemble, fetchByteArray())
+								So(newMessage.Message[17:], ShouldResemble, bytes)
+								So(newMessage.Message, ShouldResemble, fetchByteArray())
 							})
 						})
 					})
@@ -58,7 +58,7 @@ func TestAppendColor(t *testing.T) {
 		c := color.NewColor(100, 100, 23, 30)
 		m := NewMessage([]byte{})
 		m.AppendColor(c)
-		So(len(m.message), ShouldEqual, 4)
+		So(len(m.Message), ShouldEqual, 4)
 		firstByte := m.RetrieveSingleByte()
 		So(firstByte, ShouldEqual, 0x64)
 	})
@@ -68,10 +68,10 @@ func TestMessageReading(t *testing.T) {
 	Convey("read single byte", t, func() {
 		byteArray := fetchByteArray()
 		newMessage := NewMessage(byteArray)
-		So(len(newMessage.message), ShouldEqual, 33)
+		So(len(newMessage.Message), ShouldEqual, 33)
 		b := newMessage.RetrieveSingleByte()
 		So(b, ShouldEqual, 0x1)
-		So(len(newMessage.message), ShouldEqual, 32)
+		So(len(newMessage.Message), ShouldEqual, 32)
 		Convey("read float64", func() {
 			r := newMessage.RetrieveFloat64()
 			So(r, ShouldEqual, 0.64)
@@ -82,7 +82,7 @@ func TestMessageReading(t *testing.T) {
 					r := newMessage.RetrieveBool()
 					So(r, ShouldEqual, true)
 					Convey("test left bytes", func() {
-						So(len(newMessage.message), ShouldEqual, 19)
+						So(len(newMessage.Message), ShouldEqual, 19)
 					})
 					Convey("test read string", func() {
 						for i := 0; i < 3; i++ {
