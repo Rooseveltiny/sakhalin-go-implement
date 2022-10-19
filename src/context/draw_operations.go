@@ -108,12 +108,109 @@ func (ctx *Context) Arc(x, y, radius, startAngle, endAngle float64, anticlockwis
 func (ctx *Context) ArcTo(x1, y1, x2, y2, radius float64) {
 	ctx.AppendSingleByte(flags.B_ArcTo)
 	ctx.AppendFloat64(x1)
-	ctx.AppendFloat64(x2)
 	ctx.AppendFloat64(y1)
+	ctx.AppendFloat64(x2)
 	ctx.AppendFloat64(y2)
 	ctx.AppendFloat64(radius)
 }
 
 func (ctx *Context) BeginPath() {
 	ctx.AppendSingleByte(flags.B_BeginPath)
+}
+
+func (ctx *Context) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y float64) {
+	ctx.AppendSingleByte(flags.B_BezierCurveTo)
+	ctx.AppendFloat64(cp1x)
+	ctx.AppendFloat64(cp1y)
+	ctx.AppendFloat64(cp2x)
+	ctx.AppendFloat64(cp2y)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) ClearRect(x, y, width, height float64) {
+	ctx.AppendSingleByte(flags.B_ClearRect)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(width)
+	ctx.AppendFloat64(height)
+}
+
+func (ctx *Context) Clip() {
+	ctx.AppendSingleByte(flags.B_Clip)
+}
+
+func (ctx *Context) ClosePath() {
+	ctx.AppendSingleByte(flags.B_ClosePath)
+}
+
+func (ctx *Context) Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64, anticlockwise bool) {
+	ctx.AppendSingleByte(flags.B_Ellipse)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(radiusX)
+	ctx.AppendFloat64(radiusY)
+	ctx.AppendFloat64(rotation)
+	ctx.AppendFloat64(startAngle)
+	ctx.AppendFloat64(endAngle)
+	ctx.AppendBoolean(anticlockwise)
+}
+
+func (ctx *Context) Fill() {
+	ctx.AppendSingleByte(flags.B_Fill)
+}
+
+func (ctx *Context) FillRect(x, y, width, height float64) {
+	ctx.AppendSingleByte(flags.B_FillRect)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(width)
+	ctx.AppendFloat64(height)
+}
+
+func (ctx *Context) FillText(text string, x, y float64) {
+	ctx.AppendSingleByte(flags.B_FillText)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendString(text)
+}
+
+func (ctx *Context) FillTextMaxWidth(text string, x, y, maxWidth float64) {
+	ctx.AppendSingleByte(flags.B_FillTextMaxWidth)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(maxWidth)
+	ctx.AppendString(text)
+}
+
+func (ctx *Context) LineTo(x, y float64) {
+	ctx.AppendSingleByte(flags.B_LineTo)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) MoveTo(x, y float64) {
+	ctx.AppendSingleByte(flags.B_MoveTo)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) QuadraticCurveTo(cpx, cpy, x, y float64) {
+	ctx.AppendSingleByte(flags.B_QuadraticCurveTo)
+	ctx.AppendFloat64(cpx)
+	ctx.AppendFloat64(cpy)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+}
+
+func (ctx *Context) Rect(x, y, width, height float64) {
+	ctx.AppendSingleByte(flags.B_Rect)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(width)
+	ctx.AppendFloat64(height)
+}
+
+func (ctx *Context) Restore() {
+	ctx.AppendSingleByte(flags.B_Restore)
 }
