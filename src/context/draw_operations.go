@@ -94,3 +94,26 @@ func (ctx *Context) TextBaseLine(baseLine flags.TextBaseline) {
 	ctx.AppendSingleByte(flags.B_TextBaseline)
 	ctx.AppendSingleByte(byte(baseLine))
 }
+
+func (ctx *Context) Arc(x, y, radius, startAngle, endAngle float64, anticlockwise bool) {
+	ctx.AppendSingleByte(flags.B_Arc)
+	ctx.AppendFloat64(x)
+	ctx.AppendFloat64(y)
+	ctx.AppendFloat64(radius)
+	ctx.AppendFloat64(startAngle)
+	ctx.AppendFloat64(endAngle)
+	ctx.AppendBoolean(anticlockwise)
+}
+
+func (ctx *Context) ArcTo(x1, y1, x2, y2, radius float64) {
+	ctx.AppendSingleByte(flags.B_ArcTo)
+	ctx.AppendFloat64(x1)
+	ctx.AppendFloat64(x2)
+	ctx.AppendFloat64(y1)
+	ctx.AppendFloat64(y2)
+	ctx.AppendFloat64(radius)
+}
+
+func (ctx *Context) BeginPath() {
+	ctx.AppendSingleByte(flags.B_BeginPath)
+}
