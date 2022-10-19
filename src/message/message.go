@@ -23,20 +23,20 @@ func (m *Message) AppendSingleByte(b byte) {
 }
 
 func (m *Message) AppendFloat64(f float64) {
-	m.Message = append(m.Message, 0, 0, 0, 0, 0, 0, 0, 0)
+	m.Message = append(m.Message, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
 	binary.BigEndian.PutUint64(m.Message[len(m.Message)-8:], math.Float64bits(f))
 }
 
 func (m *Message) AppendUint32(ui uint32) {
-	m.Message = append(m.Message, 0, 0, 0, 0)
+	m.Message = append(m.Message, 0x0, 0x0, 0x0, 0x0)
 	binary.BigEndian.PutUint32(m.Message[len(m.Message)-4:], ui)
 }
 
 func (m *Message) AppendBoolean(b bool) {
 	if b {
-		m.AppendSingleByte(1)
+		m.AppendSingleByte(0x1)
 	} else {
-		m.AppendSingleByte(0)
+		m.AppendSingleByte(0x0)
 	}
 }
 

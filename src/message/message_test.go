@@ -96,3 +96,12 @@ func TestMessageReading(t *testing.T) {
 		})
 	})
 }
+
+func TestClearMessagePool(t *testing.T) {
+	Convey("test clear func", t, func() {
+		byteArray := fetchByteArray()
+		newMessage := NewMessage(byteArray)
+		newMessage.Clear()
+		So(len(newMessage.Message), ShouldEqual, 0)
+	})
+}
