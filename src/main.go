@@ -1,1 +1,1 @@
-package maryprotocol
+package sakhalin

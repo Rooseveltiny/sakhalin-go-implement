@@ -18,39 +18,39 @@ func NewMessage(b []byte) *Message {
 	}
 }
 
-func (m *Message) appendSingleByte(b byte) {
+func (m *Message) AppendSingleByte(b byte) {
 	m.message = append(m.message, b)
 }
 
-func (m *Message) appendFloat64(f float64) {
+func (m *Message) AppendFloat64(f float64) {
 	m.message = append(m.message, 0, 0, 0, 0, 0, 0, 0, 0)
 	binary.BigEndian.PutUint64(m.message[len(m.message)-8:], math.Float64bits(f))
 }
 
-func (m *Message) appendUint32(ui uint32) {
+func (m *Message) AppendUint32(ui uint32) {
 	m.message = append(m.message, 0, 0, 0, 0)
 	binary.BigEndian.PutUint32(m.message[len(m.message)-4:], ui)
 }
 
-func (m *Message) appendBoolean(b bool) {
+func (m *Message) AppendBoolean(b bool) {
 	if b {
-		m.appendSingleByte(1)
+		m.AppendSingleByte(1)
 	} else {
-		m.appendSingleByte(0)
+		m.AppendSingleByte(0)
 	}
 }
 
-func (m *Message) appendBytes(bytes []byte) {
+func (m *Message) AppendBytes(bytes []byte) {
 	m.message = append(m.message, bytes...)
 }
 
-func (m *Message) appendString(s string) {
-	m.appendUint32(uint32(len(s)))
+func (m *Message) AppendString(s string) {
+	m.AppendUint32(uint32(len(s)))
 	m.message = append(m.message, []byte(s)...)
 }
 
-func (m *Message) appendColor(c color.IColor) {
-	m.appendBytes(c.BinaryRGBA())
+func (m *Message) AppendColor(c color.IColor) {
+	m.AppendBytes(c.BinaryRGBA())
 }
 
 const (
@@ -64,7 +64,7 @@ const (
 	emptyString = ""
 )
 
-func (m *Message) retrieveSingleByte() byte {
+func (m *Message) RetrieveSingleByte() byte {
 	if len(m.message) < singleByte {
 		m.short()
 		return 0
@@ -74,7 +74,7 @@ func (m *Message) retrieveSingleByte() byte {
 	return b
 }
 
-func (m *Message) retrieveUint32() uint32 {
+func (m *Message) RetrieveUint32() uint32 {
 	if len(m.message) < fourBytes {
 		m.short()
 		return 0
@@ -84,7 +84,7 @@ func (m *Message) retrieveUint32() uint32 {
 	return i
 }
 
-func (m *Message) retrieveUint64() uint64 {
+func (m *Message) RetrieveUint64() uint64 {
 	if len(m.message) < eightBytes {
 		m.short()
 		return 0
@@ -94,16 +94,16 @@ func (m *Message) retrieveUint64() uint64 {
 	return i
 }
 
-func (m *Message) retrieveFloat64() float64 {
-	return math.Float64frombits(m.retrieveUint64())
+func (m *Message) RetrieveFloat64() float64 {
+	return math.Float64frombits(m.RetrieveUint64())
 }
 
-func (m *Message) retrieveBool() bool {
-	return m.retrieveSingleByte() != 0
+func (m *Message) RetrieveBool() bool {
+	return m.RetrieveSingleByte() != 0
 }
 
-func (m *Message) retrieveString() string {
-	length := int(m.retrieveUint32())
+func (m *Message) RetrieveString() string {
+	length := int(m.RetrieveUint32())
 	if len(m.message) < length {
 		m.short()
 		return emptyString
@@ -113,12 +113,12 @@ func (m *Message) retrieveString() string {
 	return s
 }
 
-func (m *Message) clear() {
+func (m *Message) Clear() {
 	m.message = make([]byte, 0, cap(m.message))
 }
 
 func (m *Message) short() {
-	m.clear()
+	m.Clear()
 	m.err = errDataTooShort{}
 }
 

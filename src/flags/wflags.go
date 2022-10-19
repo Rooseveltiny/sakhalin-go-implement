@@ -127,7 +127,6 @@ const (
 	B_FillText
 	B_Font
 	B_GradientAddColorStop
-	B_GradientAddColorStopString
 	B_FillStyleGradient
 	B_GlobalAlpha
 	B_GlobalCompositeOperation
@@ -165,9 +164,6 @@ const (
 	B_Translate
 	B_FillTextMaxWidth
 	B_StrokeTextMaxWidth
-	B_FillStyleString
-	B_StrokeStyleString
-	B_ShadowColorString
 	B_PutImageDataDirty
 	B_DrawImageScaled
 	B_DrawImageSubRectangle
