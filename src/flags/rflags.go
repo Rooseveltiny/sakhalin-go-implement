@@ -6,9 +6,9 @@ package flags
 type DeltaMode byte
 
 const (
-	bDeltaPixel DeltaMode = iota
-	bDeltaLine
-	bDeltaPage
+	B_DeltaPixel DeltaMode = iota
+	B_DeltaLine
+	B_DeltaPage
 )
 
 /*
@@ -18,32 +18,32 @@ const (
 type ModifierKeys byte
 
 const (
-	bmodKeyAlt ModifierKeys = 1 << iota
-	bmodKeyShift
-	bmodKeyCtrl
-	bmodKeyMeta
+	B_modKeyAlt ModifierKeys = 1 << iota
+	B_modKeyShift
+	B_modKeyCtrl
+	B_modKeyMeta
 )
 
 /*
 	Event mask is a special parameters to know which buttons are depressed simultaneously
 */
 
-type eventMask int
+type EventMask int
 
 const (
-	imaskMouseMove eventMask = 1 << iota
-	imaskMouseDown
-	imaskMouseUp
-	imaskKeyDown
-	imaskKeyUp
-	imaskClick
-	imaskDblClick
-	imaskAuxClick
-	imaskWheel
-	imaskTouchStart
-	imaskTouchMove
-	imaskTouchEnd
-	imaskTouchCancel
+	I_maskMouseMove EventMask = 1 << iota
+	I_maskMouseDown
+	I_maskMouseUp
+	I_maskKeyDown
+	I_maskKeyUp
+	I_maskClick
+	I_maskDblClick
+	I_maskAuxClick
+	I_maskWheel
+	I_maskTouchStart
+	I_maskTouchMove
+	I_maskTouchEnd
+	I_maskTouchCancel
 )
 
 /*
@@ -53,12 +53,12 @@ const (
 type MouseButtons byte
 
 const (
-	ButtonPrimary MouseButtons = 1 << iota
-	ButtonSecondary
-	ButtonAuxiliary
-	Button4th
-	Button5th
-	ButtonNone MouseButtons = 0
+	B_ButtonPrimary MouseButtons = 1 << iota
+	B_ButtonSecondary
+	B_ButtonAuxiliary
+	B_Button4th
+	B_Button5th
+	B_ButtonNone MouseButtons = 0
 )
 
 /*
@@ -68,17 +68,17 @@ const (
 type MouseEvent byte
 
 const (
-	bMouseMove MouseEvent = 1 + iota
-	bMouseDown
-	bMouseUp
-	bKeyDown
-	bKeyUp
-	bClick
-	bDblClick
-	bAuxClick
-	bWheel
-	bTouchStart
-	bTouchMove
-	bTouchEnd
-	bTouchCancel
+	B_MouseMove MouseEvent = 1 + iota
+	B_MouseDown
+	B_MouseUp
+	B_KeyDown
+	B_KeyUp
+	B_Click
+	B_DblClick
+	B_AuxClick
+	B_Wheel
+	B_TouchStart
+	B_TouchMove
+	B_TouchEnd
+	B_TouchCancel
 )
