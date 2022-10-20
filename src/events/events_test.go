@@ -14,12 +14,15 @@ func retrieveMessageMouseMove() *message.Message {
 func retrieveMessageMouseDown() *message.Message {
 	return message.NewMessage([]byte{2, 0b00000000, 0x0, 0x0, 0x0, 255, 0x0, 0x0, 0x1, 0xAF, 0b0001000})
 }
+
 func retrieveMessageMouseUp() *message.Message {
 	return message.NewMessage([]byte{3, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000})
 }
+
 func retrieveMessageKeyDown() *message.Message {
 	return message.NewMessage([]byte{4, 0b00000010, 0x0, 0x0, 0x0, 0x1, 0x68})
 }
+
 func retrieveMessageKeyUp() *message.Message {
 	return message.NewMessage([]byte{5, 0b00000100, 0x0, 0x0, 0x0, 0x1, 0x59})
 }
@@ -27,12 +30,15 @@ func retrieveMessageKeyUp() *message.Message {
 func retrieveMessageMouseClick() *message.Message {
 	return message.NewMessage([]byte{6, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000})
 }
+
 func retrieveMessageDoubleMouseClick() *message.Message {
 	return message.NewMessage([]byte{7, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000})
 }
+
 func retrieveMessageMouseAuxClick() *message.Message {
 	return message.NewMessage([]byte{9, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000})
 }
+
 func retrieveMessageMouseWheel() *message.Message {
 	wheelEvent := byte(9)
 	mouseEvent := []byte{0b00000000, 0x0, 0x0, 0x6b, 0x89, 0x0, 0x0, 0x0, 0x1, 0b00000010}

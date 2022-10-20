@@ -3,9 +3,9 @@ package context
 import "sakhalin/message"
 
 type Context struct {
-	settings Settings
-	draws    chan<- []byte
-	// events <- chan
+	settings    Settings
+	draws       chan<- []byte
+	events      <-chan events.Event
 	messagePool message.Message
 }
 
