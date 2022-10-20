@@ -46,3 +46,7 @@ type WheelEvent struct {
 }
 
 func (e WheelEvent) Bitmask() flags.EventMask { return flags.I_maskWheel }
+
+type MouseWheelEvent struct{ WheelEvent }
+
+func (e MouseWheelEvent) Bitmask() flags.EventMask { return flags.I_maskWheel }
