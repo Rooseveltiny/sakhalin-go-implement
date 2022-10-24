@@ -1,6 +1,7 @@
 package sakhalincomponent
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"sync"
@@ -35,9 +36,9 @@ func (wsc *WSConn) WSPerformer(w http.ResponseWriter, r *http.Request) {
 	go wsc.writeMessage(&waitGroup)
 	go wsc.readMessage(&waitGroup)
 	waitGroup.Wait()
-	waitGroup.Add(1)
-	// wsc.readCh <- byte(0b00000000)
-	waitGroup.Wait()
+	// waitGroup.Add(1)
+	// wsc.readCh <- []byte{0b00000000}
+	// waitGroup.Wait()
 }
 
 func (wsc *WSConn) readMessage(wg *sync.WaitGroup) {
@@ -48,9 +49,6 @@ func (wsc *WSConn) readMessage(wg *sync.WaitGroup) {
 			break
 		}
 		if messageType != websocket.BinaryMessage {
-			continue
-		}
-		if err != nil {
 			continue
 		}
 		wsc.readCh <- p
@@ -68,9 +66,20 @@ func (wsc *WSConn) writeMessage(wg *sync.WaitGroup) {
 	}
 }
 
-func (wsc *WSConn) RunServe() {
+func (wsc *WSConn) RunServe(ctx context.Context) {
+	s := &http.Server{
+		Addr: ":8081",
+	}
 	http.HandleFunc(wsc.route, wsc.WSPerformer)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	go func() {
+		for {
+			<-ctx.Done()
+			s.Shutdown(ctx)
+		}
+	}()
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("listen: %s\n", err)
+	}
 }
 
 func NewWSConn() *WSConn {

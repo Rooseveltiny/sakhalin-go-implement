@@ -1,6 +1,7 @@
 package sakhalincomponent
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/url"
@@ -13,7 +14,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func ClientWSConn() {
+func ClientWSConn(ctx context.Context) {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -47,8 +48,6 @@ func ClientWSConn() {
 
 	for {
 		select {
-		case <-done:
-			return
 		case t := <-ticker.C:
 			fmt.Println(t)
 			err := c.WriteMessage(websocket.BinaryMessage, []byte("Hola!"))
@@ -56,19 +55,12 @@ func ClientWSConn() {
 				log.Println("write:", err)
 				return
 			}
-		case <-interrupt:
+		case <-ctx.Done():
 			log.Println("interrupt")
-
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
 			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				log.Println("write close:", err)
 				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
 			}
 			return
 		}
@@ -79,18 +71,22 @@ func TestWsConn(t *testing.T) {
 	Convey("test init of ws conn", t, func() {
 		wsconn := NewWSConn()
 		So(wsconn.wsconn, ShouldBeNil)
-		Convey("run, serve and get Hola message", func() {
+		Convey("run, serve and get Hola message", func(c C) {
+			ctx := context.Background()
+			ctx, cancel := context.WithCancel(ctx)
 			go func() {
 				time.Sleep(1000 * time.Millisecond)
-				ClientWSConn()
+				ClientWSConn(ctx)
 			}()
 			go func() {
 				for {
 					message := <-wsconn.readCh
-					So(string(message), ShouldEqual, "Hola!")
+					fmt.Printf("message succesfully gotten: %s", string(message))
+					c.So(string(message), ShouldEqual, "Hola!")
+					cancel()
 				}
 			}()
-			wsconn.RunServe()
+			wsconn.RunServe(ctx)
 		})
 	})
 }
