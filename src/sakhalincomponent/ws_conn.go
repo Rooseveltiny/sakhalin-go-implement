@@ -1,10 +1,8 @@
 package sakhalincomponent
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"sakhalin/events"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -16,47 +14,69 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-func readMessages(conn *websocket.Conn, evs chan<- events.Event, wg *sync.WaitGroup) {
-	fmt.Println("Read message!")
+type WSConn struct {
+	route   string
+	wsconn  *websocket.Conn
+	readCh  chan []byte
+	writeCh chan []byte
 }
 
-func writeMessages(conn *websocket.Conn, message <-chan []byte, wg *sync.WaitGroup) {
-	fmt.Println("Write message!")
-}
-
-func wsEndpoint(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+func (wsc *WSConn) WSPerformer(w http.ResponseWriter, r *http.Request) {
+	var err error
+	wsc.wsconn, err = upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 	}
+	defer close(wsc.writeCh)
+	defer close(wsc.readCh)
 
-	evs := make(chan events.Event)
-	defer close(evs)
-	draws := make(chan []byte)
-	defer close(draws)
-
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	go readMessages(ws, evs, &wg)
-	go writeMessages(ws, draws, &wg)
-
-	// ctx := context.NewContext(draws, evs, h.config)
-	// go func() {
-	// 	defer wg.Done()
-	// 	h.draw(ctx)
-	// }()
-
-	wg.Wait()
-	wg.Add(1)
-	evs <- events.StopEvent{}
-	wg.Wait()
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(2)
+	go wsc.writeMessage(&waitGroup)
+	go wsc.readMessage(&waitGroup)
+	waitGroup.Wait()
+	waitGroup.Add(1)
+	// wsc.readCh <- byte(0b00000000)
+	waitGroup.Wait()
 }
 
-func setupRoutes() {
-	http.HandleFunc("/ws", wsEndpoint)
+func (wsc *WSConn) readMessage(wg *sync.WaitGroup) {
+	defer wg.Done()
+	for {
+		messageType, p, err := wsc.wsconn.ReadMessage()
+		if err != nil {
+			break
+		}
+		if messageType != websocket.BinaryMessage {
+			continue
+		}
+		if err != nil {
+			continue
+		}
+		wsc.readCh <- p
+	}
 }
 
-func RunServe() {
-	setupRoutes()
+func (wsc *WSConn) writeMessage(wg *sync.WaitGroup) {
+	defer wg.Done()
+	for {
+		message := <-wsc.writeCh
+		err := wsc.wsconn.WriteMessage(websocket.BinaryMessage, message)
+		if err != nil {
+			break
+		}
+	}
+}
+
+func (wsc *WSConn) RunServe() {
+	http.HandleFunc(wsc.route, wsc.WSPerformer)
 	log.Fatal(http.ListenAndServe(":8081", nil))
+}
+
+func NewWSConn() *WSConn {
+	return &WSConn{
+		route:   "/ws",
+		readCh:  make(chan []byte),
+		writeCh: make(chan []byte),
+	}
 }

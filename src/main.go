@@ -1,7 +1,7 @@
 package main
 
-import "sakhalin/sakhalincomponent"
+// import "sakhalin/sakhalincomponent"
 
-func main() {
-	sakhalincomponent.RunServe()
-}
+// func main() {
+// 	sakhalincomponent.RunServe()
+// }
