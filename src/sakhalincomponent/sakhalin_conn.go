@@ -14,5 +14,3 @@ type SakhalinConnection struct {
 func (sC *SakhalinConnection) RetrieveContext() *context.Context {
 	return &sC.Context
 }
-
-// func InitSakhalinConnection() *SakhalinConnection {}

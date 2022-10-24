@@ -1,6 +1,7 @@
 package sakhalincomponent
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"sakhalin/events"
@@ -16,11 +17,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func readMessages(conn *websocket.Conn, evs chan<- events.Event, wg *sync.WaitGroup) {
-
+	fmt.Println("Read message!")
 }
 
 func writeMessages(conn *websocket.Conn, message <-chan []byte, wg *sync.WaitGroup) {
-
+	fmt.Println("Write message!")
 }
 
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -39,13 +40,13 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	go readMessages(ws, evs, &wg)
 	go writeMessages(ws, draws, &wg)
 
-	// ctx := newContext(draws, evs, h.config)
+	// ctx := context.NewContext(draws, evs, h.config)
 	// go func() {
 	// 	defer wg.Done()
 	// 	h.draw(ctx)
 	// }()
 
-	wg.Wait() // <- blocks performing till wait groups all done
+	wg.Wait()
 	wg.Add(1)
 	evs <- events.StopEvent{}
 	wg.Wait()
