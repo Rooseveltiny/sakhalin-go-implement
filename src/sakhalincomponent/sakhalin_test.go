@@ -42,7 +42,7 @@ func SendMessageViaWebSocket(ctx context.Context, sendMessage chan []byte) {
 	for {
 		select {
 		case m := <-sendMessage:
-			fmt.Printf("starting to send message: %s", string(m))
+			fmt.Println("starting to send message")
 			err := c.WriteMessage(websocket.BinaryMessage, m)
 			if err != nil {
 				log.Println("write:", err)
@@ -65,27 +65,38 @@ func TestSakhalinSendingMessages(t *testing.T) {
 		ctx := context.Background()
 		ctx, cancel := context.WithCancel(ctx)
 		sakhalinConn := NewSakhalinConnection("/ws")
-		go func() {
-			// init sakhalin connection
-			var evs chan events.Event
-			sakhalinConn.RetrieveEvents(evs)
-			fmt.Println(<-evs)
-		}()
-		go func() {
-			// init client connection
-			time.Sleep(1 * time.Second)
-			var sendM chan []byte
-			go SendMessageViaWebSocket(ctx, sendM)
-			time.Sleep(1 * time.Second)
-			sendM <- []byte{9, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000}
-		}()
-		go func() {
-			// init closing gorutines
-			time.Sleep(5 * time.Second)
-			cancel()
-		}()
-		sakhalinConn.RunSakhalinListen(ctx)
+		Convey("test sakhalin send event", func(c C) {
+			go func() {
+				// init sakhalin connection
+				evs := make(chan events.Event)
+				sakhalinConn.RetrieveEvents(evs)
+				fmt.Println(<-evs)
+			}()
+			go func() {
+				// init client connection
+				time.Sleep(1 * time.Second)
+				sendM := make(chan []byte)
+				go SendMessageViaWebSocket(ctx, sendM)
+				time.Sleep(1 * time.Second)
+				sendM <- []byte{9, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000}
+			}()
+			Convey("test send draw operations", func(c C) {
+				go func() {
+					canvasCtx := sakhalinConn.RetrieveContext()
+					canvasCtx.LineTo(10, 10)
+					canvasCtx.Go()
+					fmt.Println(canvasCtx)
+				}()
+				go func() {
+					// init closing gorutines
+					time.Sleep(5 * time.Second)
+					cancel()
+				}()
+				sakhalinConn.RunSakhalinListen(ctx)
+			})
+		})
 	})
+
 }
 
 func TestSakhalinInit(t *testing.T) {

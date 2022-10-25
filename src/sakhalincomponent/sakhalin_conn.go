@@ -15,7 +15,6 @@ import (
 type SakhalinConnection struct {
 	Context *canvasctx.Context
 	WSConn  *WSConn
-	// Events  chan events.Event
 }
 
 func (sC *SakhalinConnection) RetrieveContext() *canvasctx.Context {
@@ -23,16 +22,28 @@ func (sC *SakhalinConnection) RetrieveContext() *canvasctx.Context {
 }
 
 func (sC *SakhalinConnection) RetrieveEvents(eventCh chan events.Event) {
-	eventData := <-sC.WSConn.readCh
-	decodedEvent, _ := events.DecodeEvent(message.NewMessage(eventData))
-	eventCh <- decodedEvent
+	go func() {
+		eventData := <-sC.WSConn.readCh
+		decodedEvent, _ := events.DecodeEvent(message.NewMessage(eventData))
+		eventCh <- decodedEvent
+	}()
 }
 
-func (sC *SakhalinConnection) Draw() {
-	sC.WSConn.writeCh <- <-sC.RetrieveContext().Draws
+func (sC *SakhalinConnection) Draw(ctx context.Context) {
+	go func() {
+		for {
+			select {
+			case draws := <-sC.Context.Draws:
+				sC.WSConn.writeCh <- draws
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 }
 
 func (sC *SakhalinConnection) RunSakhalinListen(ctx context.Context) {
+	sC.Draw(ctx)
 	sC.WSConn.RunServe(ctx)
 }
 
