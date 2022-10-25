@@ -29,7 +29,7 @@ func (sC *SakhalinConnection) RetrieveEvents(eventCh chan events.Event) {
 	}()
 }
 
-func (sC *SakhalinConnection) Draw(ctx context.Context) {
+func (sC *SakhalinConnection) runDrawing(ctx context.Context) {
 	go func() {
 		for {
 			select {
@@ -43,7 +43,7 @@ func (sC *SakhalinConnection) Draw(ctx context.Context) {
 }
 
 func (sC *SakhalinConnection) RunSakhalinListen(ctx context.Context) {
-	sC.Draw(ctx)
+	sC.runDrawing(ctx)
 	sC.WSConn.RunServe(ctx)
 }
 
@@ -53,7 +53,6 @@ func NewSakhalinConnection(listenRoute string) *SakhalinConnection {
 	newSakhalin := &SakhalinConnection{
 		Context: canvasCtx,
 		WSConn:  newWS,
-		// Events:  make(chan events.Event),
 	}
 	return newSakhalin
 }

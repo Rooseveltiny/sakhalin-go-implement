@@ -13,7 +13,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func SendMessageViaWebSocket(ctx context.Context, sendMessage chan []byte) {
+func SendMessageViaWebSocket(ctx context.Context, sendMessage chan []byte, readMessage chan []byte) {
 
 	u := url.URL{Scheme: "ws", Host: "127.0.0.1:8081", Path: "/ws"}
 	log.Printf("connecting to %s", u.String())
@@ -35,6 +35,7 @@ func SendMessageViaWebSocket(ctx context.Context, sendMessage chan []byte) {
 				log.Println("read:", err)
 				return
 			}
+			readMessage <- message
 			log.Printf("recv: %s", message)
 		}
 	}()
@@ -65,6 +66,8 @@ func TestSakhalinSendingMessages(t *testing.T) {
 		ctx := context.Background()
 		ctx, cancel := context.WithCancel(ctx)
 		sakhalinConn := NewSakhalinConnection("/ws")
+		readM := make(chan []byte)
+		sendM := make(chan []byte)
 		Convey("test sakhalin send event", func(c C) {
 			go func() {
 				// init sakhalin connection
@@ -75,8 +78,8 @@ func TestSakhalinSendingMessages(t *testing.T) {
 			go func() {
 				// init client connection
 				time.Sleep(1 * time.Second)
-				sendM := make(chan []byte)
-				go SendMessageViaWebSocket(ctx, sendM)
+
+				go SendMessageViaWebSocket(ctx, sendM, readM)
 				time.Sleep(1 * time.Second)
 				sendM <- []byte{9, 0b00000001, 0x0, 0x0, 0x11, 0x95, 0x0, 0x0, 0x2, 0xBC, 0b0001000}
 			}()
@@ -84,8 +87,9 @@ func TestSakhalinSendingMessages(t *testing.T) {
 				go func() {
 					canvasCtx := sakhalinConn.RetrieveContext()
 					canvasCtx.LineTo(10, 10)
-					canvasCtx.Go()
-					fmt.Println(canvasCtx)
+					canvasCtx.Draw()
+					c.So(len(canvasCtx.Draws), ShouldBeZeroValue)
+					c.So(<-readM, ShouldResemble, []byte{28, 64, 36, 0, 0, 0, 0, 0, 0, 64, 36, 0, 0, 0, 0, 0, 0})
 				}()
 				go func() {
 					// init closing gorutines
@@ -108,6 +112,33 @@ func TestSakhalinInit(t *testing.T) {
 			cancel()
 		}()
 		sc := NewSakhalinConnection("/ws")
+		sc.RunSakhalinListen(ctx)
+	})
+}
+
+func TestDrawContext(t *testing.T) {
+	Convey("draw cotext try some commands", t, func(c C) {
+		ctx := context.Background()
+		ctx, cancel := context.WithCancel(ctx)
+		sc := NewSakhalinConnection("/ws")
+		readM := make(chan []byte)
+		writeM := make(chan []byte)
+		go func() {
+			time.Sleep(1 * time.Second)
+			canvasCtx := sc.RetrieveContext()
+			canvasCtx.LineTo(10, 10)
+			canvasCtx.LineTo(10, 10)
+			canvasCtx.LineTo(10, 10)
+			canvasCtx.LineTo(10, 10)
+			canvasCtx.MoveTo(10, 10)
+			canvasCtx.Draw()
+			SendMessageViaWebSocket(ctx, writeM, readM)
+			c.So(len(<-readM), ShouldEqual, 85)
+		}()
+		go func() {
+			time.Sleep(2 * time.Second)
+			cancel()
+		}()
 		sc.RunSakhalinListen(ctx)
 	})
 }

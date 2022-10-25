@@ -5,20 +5,20 @@ import (
 )
 
 type Context struct {
-	settings Settings
-	Draws    chan []byte
-	// events      <-chan events.Event
+	settings    Settings
+	Draws       chan []byte
 	messagePool message.Message
 }
 
 func NewContext() *Context {
-	return &Context{}
+	return &Context{
+		settings:    Settings{},
+		Draws:       make(chan []byte),
+		messagePool: message.Message{},
+	}
 }
 
-// func (ctx *Context) Events() <-chan events.Event {
-// 	return ctx.events
-// }
-
-func (ctx *Context) Go() {
+func (ctx *Context) Draw() {
 	ctx.Draws <- ctx.messagePool.Message
+	ctx.Clear()
 }

@@ -36,9 +36,6 @@ func (wsc *WSConn) WSPerformer(w http.ResponseWriter, r *http.Request) {
 	go wsc.writeMessage(&waitGroup)
 	go wsc.readMessage(&waitGroup)
 	waitGroup.Wait()
-	// waitGroup.Add(1)
-	// wsc.readCh <- []byte{0b00000000}
-	// waitGroup.Wait()
 }
 
 func (wsc *WSConn) readMessage(wg *sync.WaitGroup) {
