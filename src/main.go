@@ -1,4 +1,4 @@
-package main
+package sakhalin
 
 // import "sakhalin/sakhalincomponent"
 

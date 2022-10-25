@@ -69,7 +69,7 @@ func ClientWSConn(ctx context.Context) {
 
 func TestWsConn(t *testing.T) {
 	Convey("test init of ws conn", t, func() {
-		wsconn := NewWSConn()
+		wsconn := NewWSConn("/ws")
 		So(wsconn.wsconn, ShouldBeNil)
 		Convey("run, serve and get Hola message", func(c C) {
 			ctx := context.Background()

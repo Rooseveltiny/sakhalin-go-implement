@@ -82,9 +82,9 @@ func (wsc *WSConn) RunServe(ctx context.Context) {
 	}
 }
 
-func NewWSConn() *WSConn {
+func NewWSConn(route string) *WSConn {
 	return &WSConn{
-		route:   "/ws",
+		route:   route,
 		readCh:  make(chan []byte),
 		writeCh: make(chan []byte),
 	}
