@@ -15,7 +15,7 @@ import (
 type SakhalinConnection struct {
 	Context *canvasctx.Context
 	WSConn  *WSConn
-	Events  chan events.Event
+	// Events  chan events.Event
 }
 
 func (sC *SakhalinConnection) RetrieveContext() *canvasctx.Context {
@@ -32,14 +32,17 @@ func (sC *SakhalinConnection) Draw() {
 	sC.WSConn.writeCh <- <-sC.RetrieveContext().Draws
 }
 
-func NewSakhalinConnection(listenRoute string, ctx context.Context) *SakhalinConnection {
+func (sC *SakhalinConnection) RunSakhalinListen(ctx context.Context) {
+	sC.WSConn.RunServe(ctx)
+}
+
+func NewSakhalinConnection(listenRoute string) *SakhalinConnection {
 	newWS := NewWSConn("/ws")
 	canvasCtx := canvasctx.NewContext()
 	newSakhalin := &SakhalinConnection{
 		Context: canvasCtx,
 		WSConn:  newWS,
-		Events:  make(chan events.Event),
+		// Events:  make(chan events.Event),
 	}
-	newSakhalin.WSConn.RunServe(ctx)
 	return newSakhalin
 }
