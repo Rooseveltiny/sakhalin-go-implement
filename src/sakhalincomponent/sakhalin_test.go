@@ -61,6 +61,19 @@ func SendMessageViaWebSocket(ctx context.Context, sendMessage chan []byte, readM
 	}
 }
 
+func TestRunSakhalinComponent(t *testing.T) {
+	Convey("run sakhalin component for infinite", t, func(c C) {
+		ctx := context.Background()
+		ctx, cancel := context.WithCancel(ctx)
+		sakhalinConn := NewSakhalinConnection("/ws")
+		go func() {
+			time.Sleep(10 * time.Second)
+			cancel()
+		}()
+		sakhalinConn.RunSakhalinListen(ctx)
+	})
+}
+
 func TestSakhalinSendingMessages(t *testing.T) {
 	Convey("init sakhalin", t, func(c C) {
 		ctx := context.Background()
